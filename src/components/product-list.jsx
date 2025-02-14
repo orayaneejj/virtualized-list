@@ -5,7 +5,7 @@ import usePagination from "../hooks/usePagination";
 import { useDispatch } from "react-redux";
 import { removeProduct } from "../store/productSlice";
 import { EditProductModal } from "./edit-product-modal";
-
+import { exportToCSV } from "../utils/exportToCsv";
 function ProductList() {
   const { products, hasNextPage, loadMoreProducts } = usePagination();
   const dispatch = useDispatch();
@@ -122,7 +122,15 @@ function ProductList() {
       <div className="grid grid-cols-4 items-center p-4 border-b border-gray-200 bg-[#ecf0f3] rounded-t-lg text-gray-600">
         <span className="text-lg font-semibold col-span-2">Products</span>
         <span className="text-lg font-semibold">Price</span>
-        <span className="text-lg font-semibold text-right"></span>
+        <div className="flex justify-end">
+          <button
+            className="text-lg  font-semibold  cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white w-1/2 px-4 py-2 rounded-md
+         hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={() => exportToCSV(products)}
+          >
+            Export CSV
+          </button>
+        </div>
       </div>
 
       <InfiniteLoader
