@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import usePagination from "../hooks/usePagination";
+import { useDispatch } from "react-redux";
+import { removeProduct } from "../store/productSlice";
+import { EditProductModal } from "./edit-product-modal";
 
-const ProductList = () => {
+function ProductList() {
   const { products, hasNextPage, loadMoreProducts } = usePagination();
+  const dispatch = useDispatch();
+  const handleRemoveProduct = (productId) => {
+    dispatch(removeProduct(productId));
+  };
 
   const isProductLoaded = (index) => index < products.length;
 
@@ -31,6 +38,20 @@ const ProductList = () => {
     }
 
     const product = products[index];
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const toggleMenu = () => {
+      setIsMenuOpen(!isMenuOpen);
+    };
+    const handleDeleteClick = (productId) => {
+      handleRemoveProduct(productId);
+      setIsMenuOpen(false);
+    };
+    const handleEditClick = (productId) => {
+      setIsEditModalOpen(true);
+      setIsMenuOpen(false);
+    };
+
     return (
       <div
         style={style}
@@ -50,7 +71,10 @@ const ProductList = () => {
         <p className="text-sm text-gray-600 ">${product.price}</p>
 
         <div className="flex justify-end">
-          <button className="p-2 rounded-full hover:bg-gray-200 transition-colors">
+          <button
+            onClick={toggleMenu}
+            className="p-2 rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-gray-500"
@@ -66,16 +90,39 @@ const ProductList = () => {
               />
             </svg>
           </button>
+          {isMenuOpen && (
+            <div className="absolute top-20 right-1 font-semibold bg-white border border-gray-200 rounded-md shadow-lg z-10">
+              <button
+                className="w-full p-2 text-left text-gray-600 hover:opacity-100 transition-opacity opacity-60 cursor-pointer"
+                onClick={() => handleEditClick(product.id)}
+              >
+                Edit
+              </button>
+              <button
+                className="w-full p-2 text-left text-gray-600 hover:opacity-100 transition-opacity opacity-60 cursor-pointer"
+                onClick={() => handleDeleteClick(product.id)}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+          {isEditModalOpen && (
+            <EditProductModal
+              product={product}
+              setIsEditModalOpen={setIsEditModalOpen}
+            />
+          )}
         </div>
       </div>
     );
   };
 
   return (
-    <div className="virtualized-wrapper p-6 bg-[#f6f8fa] rounded-3xl shadow-md w-full border border-gray-200 max-w-7xl mt-5">
+    <div className="virtualized-wrapper p-6 bg-[#f6f8fa] rounded-lg shadow-md w-7xl border border-gray-200">
       <div className="grid grid-cols-4 items-center p-4 border-b border-gray-200 bg-[#ecf0f3] rounded-t-lg text-gray-600">
         <span className="text-lg font-semibold col-span-2">Products</span>
         <span className="text-lg font-semibold">Price</span>
+        <span className="text-lg font-semibold text-right"></span>
       </div>
 
       <InfiniteLoader
@@ -98,6 +145,6 @@ const ProductList = () => {
       </InfiniteLoader>
     </div>
   );
-};
+}
 
 export default ProductList;
