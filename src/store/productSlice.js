@@ -41,6 +41,10 @@ const productsSlice = createSlice({
       );
       saveProductsToLocalStorage(state.products);
     },
+    addProduct: (state, action) => {
+      state.products.push(action.payload);
+      saveProductsToLocalStorage(state.products);
+    },
   },
 });
 
@@ -50,5 +54,6 @@ export const {
   updatePage,
   removeProduct,
   editProduct,
+  addProduct,
 } = productsSlice.actions;
 export default productsSlice.reducer;

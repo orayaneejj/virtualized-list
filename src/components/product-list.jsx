@@ -5,6 +5,7 @@ import usePagination from "../hooks/usePagination";
 import { useDispatch } from "react-redux";
 import { removeProduct } from "../store/productSlice";
 import { EditProductModal } from "./edit-product-modal";
+import { AddProductModal } from "./add-product-modal";
 import { exportToCSV } from "../utils/exportToCsv";
 function ProductList() {
   const { products, hasNextPage, loadMoreProducts } = usePagination();
@@ -40,6 +41,7 @@ function ProductList() {
     const product = products[index];
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
     const toggleMenu = () => {
       setIsMenuOpen(!isMenuOpen);
     };
@@ -116,21 +118,49 @@ function ProductList() {
       </div>
     );
   };
-
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   return (
     <div className="virtualized-wrapper p-6 bg-[#f6f8fa] rounded-lg shadow-md w-7xl border border-gray-200">
       <div className="grid grid-cols-4 items-center p-4 border-b border-gray-200 bg-[#ecf0f3] rounded-t-lg text-gray-600">
         <span className="text-lg font-semibold col-span-2">Products</span>
         <span className="text-lg font-semibold">Price</span>
-        <div className="flex justify-end">
+        <div className="flex justify-end relative">
           <button
-            className="text-lg  font-semibold  cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white w-1/2 px-4 py-2 rounded-md
-         hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            onClick={() => exportToCSV(products)}
+            className="text-lg font-semibold cursor-pointer bg-gradient-to-r from-blue-500 to-blue-600 text-white w-1/2 px-4 py-2 rounded-md
+            hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-sm hover:shadow-md
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            Export CSV
+            File
           </button>
+
+          {/* dropdown for add , export products */}
+          {isDropdownOpen && (
+            <div
+              onMouseLeave={() => setIsDropdownOpen(false)}
+              className="absolute right-0 top-10 mt-2 z-20 w-48 font-semibold bg-white border border-gray-200 rounded-md shadow-lg"
+            >
+              <ul className="py-1">
+                <li
+                  className="text-gray-700 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => setIsAddModalOpen(true)}
+                >
+                  Add Product
+                </li>
+                <li
+                  className="text-gray-700 px-4 py-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => exportToCSV(products)}
+                >
+                  Export CSV
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
+        {isAddModalOpen && (
+          <AddProductModal setIsAddModalOpen={setIsAddModalOpen} />
+        )}
       </div>
 
       <InfiniteLoader
